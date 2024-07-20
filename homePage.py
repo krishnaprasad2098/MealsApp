@@ -1,0 +1,181 @@
+# from PyQt5.QtWidgets import (
+#     QWidget,
+#     QVBoxLayout,
+#     QLabel,
+#     QLineEdit,
+#     QPushButton,
+#     QComboBox,
+#     QCheckBox,
+# )
+# from PyQt5.QtGui import QFont
+# from PyQt5.QtCore import Qt
+
+
+# class HomePage(QWidget):
+#     def __init__(self, parent):
+#         super().__init__()
+#         self.parent = parent
+#         self.initUI()
+
+#     def initUI(self):
+#         layout = QVBoxLayout()
+#         layout.setSpacing(20)
+
+#         title = QLabel("Welcome to Meal Planner")
+#         title.setAlignment(Qt.AlignCenter)
+#         title.setFont(QFont("Arial", 18, QFont.Bold))
+#         layout.addWidget(title)
+
+#         layout.addWidget(QLabel("Select your dietary type:"))
+#         self.dietary_type_combo = QComboBox()
+#         self.dietary_type_combo.addItems(
+#             ["vegetarian", "vegan", "pescatarian", "non-vegetarian"]
+#         )
+#         self.dietary_type_combo.setStyleSheet("QComboBox { padding: 5px; }")
+#         layout.addWidget(self.dietary_type_combo)
+
+#         layout.addWidget(QLabel("Select any allergies:"))
+#         self.allergy_checkboxes = []
+#         allergies = ["nuts", "dairy", "gluten", "soy", "shellfish"]
+#         for allergy in allergies:
+#             checkbox = QCheckBox(allergy)
+#             checkbox.setStyleSheet("QCheckBox { padding: 5px; }")
+#             self.allergy_checkboxes.append(checkbox)
+#             layout.addWidget(checkbox)
+
+#         layout.addWidget(
+#             QLabel(
+#                 'Enter available ingredients (comma-separated, e.g., "chicken, vegetables, rice"):'
+#             )
+#         )
+#         self.ingredients_input = QLineEdit()
+#         self.ingredients_input.setStyleSheet("QLineEdit { padding: 5px; }")
+#         layout.addWidget(self.ingredients_input)
+
+#         generate_button = QPushButton("Generate Meal Plan")
+#         generate_button.clicked.connect(self.parent.generate_meal_plan)
+#         generate_button.setStyleSheet(
+#             "QPushButton { padding: 10px; background-color: #4CAF50; color: white; }"
+#         )
+#         layout.addWidget(generate_button)
+
+#         self.setLayout(layout)
+
+#     def get_preferences(self):
+#         dietary_type = self.dietary_type_combo.currentText()
+#         allergies = [
+#             allergy.text() for allergy in self.allergy_checkboxes if allergy.isChecked()
+#         ]
+#         ingredients = [
+#             ing.strip()
+#             for ing in self.ingredients_input.text().split(",")
+#             if ing.strip()
+#         ]
+#         return dietary_type, allergies, ingredients
+
+from PyQt5.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QComboBox,
+    QListWidget,
+    QScrollArea,
+)
+from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt
+
+
+class HomePage(QWidget):
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+        self.allergies = []
+        self.ingredients = []
+        self.initUI()
+
+    def initUI(self):
+        layout = QVBoxLayout()
+        layout.setSpacing(20)
+
+        title = QLabel("Welcome to Meal Planner")
+        title.setAlignment(Qt.AlignCenter)
+        title.setFont(QFont("Arial", 18, QFont.Bold))
+        layout.addWidget(title)
+
+        # Dietary Type
+        layout.addWidget(QLabel("Select your dietary type:"))
+        self.dietary_type_combo = QComboBox()
+        self.dietary_type_combo.addItems(
+            ["vegetarian", "vegan", "pescatarian", "non-vegetarian"]
+        )
+        self.dietary_type_combo.setStyleSheet("QComboBox { padding: 5px; }")
+        layout.addWidget(self.dietary_type_combo)
+
+        # Allergies
+        layout.addWidget(QLabel("Add your allergies:"))
+        allergy_layout = QHBoxLayout()
+        self.allergy_input = QLineEdit()
+        self.allergy_input.setPlaceholderText("Enter an allergy")
+        allergy_layout.addWidget(self.allergy_input)
+        add_allergy_btn = QPushButton("Add")
+        add_allergy_btn.clicked.connect(self.add_allergy)
+        allergy_layout.addWidget(add_allergy_btn)
+        layout.addLayout(allergy_layout)
+
+        self.allergy_list = QListWidget()
+        self.allergy_list.setStyleSheet("QListWidget { border: 1px solid gray; }")
+        layout.addWidget(self.allergy_list)
+
+        # Ingredients
+        layout.addWidget(QLabel("Add your available ingredients:"))
+        ingredient_layout = QHBoxLayout()
+        self.ingredient_input = QLineEdit()
+        self.ingredient_input.setPlaceholderText("Enter an ingredient")
+        ingredient_layout.addWidget(self.ingredient_input)
+        add_ingredient_btn = QPushButton("Add")
+        add_ingredient_btn.clicked.connect(self.add_ingredient)
+        ingredient_layout.addWidget(add_ingredient_btn)
+        layout.addLayout(ingredient_layout)
+
+        self.ingredient_list = QListWidget()
+        self.ingredient_list.setStyleSheet("QListWidget { border: 1px solid gray; }")
+        layout.addWidget(self.ingredient_list)
+
+        # Generate Button
+        generate_button = QPushButton("Generate Meal Plan")
+        generate_button.clicked.connect(self.parent.generate_meal_plan)
+        generate_button.setStyleSheet(
+            "QPushButton { padding: 10px; background-color: #4CAF50; color: white; }"
+        )
+        layout.addWidget(generate_button)
+
+        # Wrap everything in a scroll area
+        scroll = QScrollArea()
+        container = QWidget()
+        container.setLayout(layout)
+        scroll.setWidget(container)
+        scroll.setWidgetResizable(True)
+
+        main_layout = QVBoxLayout(self)
+        main_layout.addWidget(scroll)
+
+    def add_allergy(self):
+        allergy = self.allergy_input.text().strip()
+        if allergy and allergy not in self.allergies:
+            self.allergies.append(allergy)
+            self.allergy_list.addItem(allergy)
+            self.allergy_input.clear()
+
+    def add_ingredient(self):
+        ingredient = self.ingredient_input.text().strip()
+        if ingredient and ingredient not in self.ingredients:
+            self.ingredients.append(ingredient)
+            self.ingredient_list.addItem(ingredient)
+            self.ingredient_input.clear()
+
+    def get_preferences(self):
+        dietary_type = self.dietary_type_combo.currentText()
+        return dietary_type, self.allergies, self.ingredients
