@@ -14,9 +14,7 @@ class MealPlanner(QWidget):
 
     def initUI(self):
         self.setWindowTitle("Meal Planner")
-        self.setGeometry(
-            100, 100, 600, 800
-        )  # Increased height to accommodate new elements
+        self.setGeometry(100, 100, 600, 800)
         self.setStyleSheet("QWidget { font-size: 14px; }")
 
         palette = QPalette()
