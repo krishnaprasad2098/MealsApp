@@ -14,6 +14,7 @@ from PyQt5.QtCore import Qt
 
 
 class HomePage(QWidget):
+
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
@@ -54,6 +55,10 @@ class HomePage(QWidget):
         self.allergy_list.setStyleSheet("QListWidget { border: 1px solid gray; }")
         layout.addWidget(self.allergy_list)
 
+        delete_allergy_btn = QPushButton("Delete Selected")
+        delete_allergy_btn.clicked.connect(self.delete_allergy)
+        layout.addWidget(delete_allergy_btn)
+
         # Ingredients
         layout.addWidget(QLabel("Add your available ingredients:"))
         ingredient_layout = QHBoxLayout()
@@ -91,8 +96,19 @@ class HomePage(QWidget):
         allergy = self.allergy_input.text().strip()
         if allergy and allergy not in self.allergies:
             self.allergies.append(allergy)
+            # item = QListWidget(allergy)
             self.allergy_list.addItem(allergy)
+            # self.allergy_list.addItem(item)
             self.allergy_input.clear()
+
+    def delete_allergy(self):
+        selected_items = self.allergy_list.selectedItems()
+        if not selected_items:
+            return
+        for item in selected_items:
+            allergy = item.text()
+            self.allergies.remove(allergy)
+            self.allergy_list.takeItem(self.allergy_list.row(item))
 
     def add_ingredient(self):
         ingredient = self.ingredient_input.text().strip()
