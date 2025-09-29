@@ -1,0 +1,11 @@
+name: "CI Build"
+on : "push"
+jobs:
+  Build:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Intsall Packages
+      - run: pip install -r requirements.txt
+
+      - name: Deploying
+      - run: echo "Deploying ..."
